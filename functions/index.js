@@ -2,43 +2,60 @@ require("dotenv").config();
 
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const express = require("express");
 
 admin.initializeApp();
 
-exports.getPosts = functions.https.onRequest((req, res) => {
-  admin
-    .firestore()
-    .collection("posts")
-    .get()
-    .then(snap => {
-      const posts = snap.docs.map(doc => doc.data());
-      return res.json(posts);
-    })
-    .catch(err => console.log(err));
-});
+const app = express();
 
-exports.createPost = functions.https.onRequest((req, res) => {
-  if (req.method !== "POST") {
-    return res.status(400).json({ error: "Method is not allowed" });
-  }
+app.get("/posts", async (req, res) => {
+  try {
+    const snap = await admin
+      .firestore()
+      .collection("posts")
+      .orderBy("createdAt", "desc")
+      .get();
 
-  const { userHandle, body } = req.body;
+    const posts = snap.docs.map(doc => {
+      const { body, userHandle, createdAt } = doc.data();
 
-  const newPost = {
-    userHandle,
-    body,
-    createdAt: admin.firestore.Timestamp.fromDate(new Date())
-  };
-
-  admin
-    .firestore()
-    .collection("posts")
-    .add(newPost)
-    .then(doc => {
-      return res.json({ message: `document ${doc.id} created successfully` });
-    })
-    .catch(err => {
-      console.log(err);
-      return res.status(500).json({ error: "Something went worng" });
+      return {
+        id: doc.id,
+        body,
+        userHandle,
+        createdAt
+      };
     });
+
+    return res.json(posts);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
+
+app.post("/posts", async (req, res) => {
+  try {
+    const { userHandle, body } = req.body;
+
+    const newPost = {
+      userHandle,
+      body,
+      createdAt: new Date().toISOString()
+    };
+
+    const doc = await admin
+      .firestore()
+      .collection("posts")
+      .add(newPost);
+
+    return res.json({ message: `document ${doc.id} created successfully` });
+  } catch (error) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.use((req, res) => res.status(404).json({ message: "Not found" }));
+
+exports.api = functions.https.onRequest(app);
