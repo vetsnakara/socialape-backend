@@ -1,10 +1,9 @@
-const admin = require("firebase-admin");
+const db = require("firebase-admin").firestore();
 
 // get all posts
 exports.getAll = async (req, res) => {
   try {
-    const snap = await admin
-      .firestore()
+    const snap = await db
       .collection("posts")
       .orderBy("createdAt", "desc")
       .get();
@@ -38,10 +37,7 @@ exports.create = async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    const doc = await admin
-      .firestore()
-      .collection("posts")
-      .add(newPost);
+    const doc = await db.collection("posts").add(newPost);
 
     return res.json({ message: `document ${doc.id} created successfully` });
   } catch (error) {
