@@ -1,17 +1,35 @@
 const firebase = require("firebase");
 const db = require("firebase-admin").firestore();
 
+const { validate, schemas } = require("../validation");
+
+// sign up
 exports.signUp = async (req, res) => {
   try {
-    const { email, handle, password, confirmPassword } = req.body;
+    const { email, handle, password, passwordConfirm } = req.body;
 
-    // todo: add form validation
+    // validate form data
+    const validationError = validate(
+      {
+        handle,
+        email,
+        password,
+        passwordConfirm
+      },
+      schemas.signUp
+    );
+
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
 
     // check for existing user with the same handle
-    const doc = db.doc(`/users/${handle}`).get();
+    const doc = await db.doc(`/users/${handle}`).get();
 
-    if (doc.exist) {
-      return res.status(400).json({ handle: "this handle is already taken" });
+    if (doc.exists) {
+      return res
+        .status(400)
+        .json({ handle: `Handle '${handle}' is already taken` });
     }
 
     // signing up user
@@ -32,9 +50,46 @@ exports.signUp = async (req, res) => {
 
     return res.status(201).json({ token });
   } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      return res.status(404).json({ email: "Email is already in use" });
+    switch (error.code) {
+      case "auth/email-already-in-use":
+        return res.status(400).json({ email: "Email is already in use" });
+      case "auth/weak-password":
+        return res.status(400).json({ password: "Weak password" });
+      default:
+        return res.status(500).json({ error: error.code });
     }
-    return res.status(500).json({ error: error.code });
+  }
+};
+
+// log in
+exports.logIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // validate form data
+    const validationError = validate({ email, password }, schemas.logIn);
+
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
+    // login
+    const { user: authUser } = await firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password);
+
+    const token = await authUser.getIdToken();
+
+    return res.status(200).json({ token });
+  } catch (error) {
+    switch (error.code) {
+      case "auth/user-not-found":
+      case "auth/wrong-password":
+        return res
+          .status(403)
+          .json({ error: "Wrong credentials. Please, try again." });
+      default:
+        return res.status(403).json({ error: error.code });
+    }
   }
 };
