@@ -29,10 +29,10 @@ exports.getAll = async (req, res) => {
 // create new post
 exports.create = async (req, res) => {
   try {
-    const { userHandle, body } = req.body;
+    const { body } = req.body;
 
     const newPost = {
-      userHandle,
+      userHandle: req.locals.user.handle,
       body,
       createdAt: new Date().toISOString()
     };
