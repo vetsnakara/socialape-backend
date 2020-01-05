@@ -1,6 +1,4 @@
-const admin = require("firebase-admin");
-
-const db = admin.firestore();
+const { admin, db } = require("../services/firebase");
 
 exports.isAuthenticated = async (req, res, next) => {
   try {
@@ -32,6 +30,11 @@ exports.isAuthenticated = async (req, res, next) => {
 
     return res.status(403).json({ error: "Unauthorized" });
   } catch (error) {
-    return res.status(403).json(error);
+    switch (error.code) {
+      case "auth/id-token-expired":
+        return res.status(403).json({ error: "Token is expired" });
+      default:
+        return res.status(403).json(error);
+    }
   }
 };

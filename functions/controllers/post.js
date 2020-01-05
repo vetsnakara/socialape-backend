@@ -1,4 +1,4 @@
-const db = require("firebase-admin").firestore();
+const { db } = require("../services/firebase");
 
 // get all posts
 exports.getAll = async (req, res) => {

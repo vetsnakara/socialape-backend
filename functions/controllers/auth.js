@@ -1,7 +1,5 @@
-const firebase = require("firebase");
-const db = require("firebase-admin").firestore();
-
-const { validate, schemas } = require("../validation");
+const { firebase, db } = require("../services/firebase");
+const { validate, schemas } = require("../utils/validation");
 
 // sign up
 exports.signUp = async (req, res) => {

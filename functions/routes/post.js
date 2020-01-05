@@ -1,8 +1,6 @@
-const express = require("express");
+const router = require("express").Router();
 const { getAll, create } = require("../controllers/post");
 const { isAuthenticated } = require("../middlerare/auth");
-
-const router = express.Router();
 
 // get all posts
 router.get("/", getAll);
