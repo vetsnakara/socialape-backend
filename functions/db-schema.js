@@ -1,4 +1,18 @@
+// db schema
 const db = {
+  users: [
+    {
+      userId: "dsfhsdjhflsfdh",
+      email: "test@test.com",
+      handle: "user",
+      createdAt: "2020-01-04T19:23:12.102Z",
+      imageUrl:
+        "https://firebasestorage.googleapis.com/v0/b/socialape-4ad65.appspot.com/o/avatar-8d55ac86.png?alt=media",
+      bio: "Hello, my name is ...",
+      website: "https://user.com",
+      location: "Saint-Pertersburg, Russia"
+    }
+  ],
   posts: [
     {
       userHandler: "user",
@@ -7,5 +21,24 @@ const db = {
       likeCount: 5,
       commentCount: 10
     }
+  ]
+};
+
+// redux state
+const userDetails = {
+  credentials: {
+    userId: "fdhfdhgfh5345fdgd",
+    email: "user@email.com",
+    handle: "user",
+    createdAt: "2020-01-04T19:23:12.102Z",
+    imageUrl:
+      "https://firebasestorage.googleapis.com/v0/b/socialape-4ad65.appspot.com/o/avatar-8d55ac86.png?alt=media",
+    bio: "Hello, my name is...",
+    website: "https://user.com",
+    location: "Saint-Petersburg, Russia"
+  },
+  likes: [
+    { userHandle: "user", postId: "sdjfsh8uhsdhf87" },
+    { userHandle: "user", postId: "fdgdh878sdhf6d6" }
   ]
 };

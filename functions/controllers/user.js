@@ -7,7 +7,30 @@ const uniqueFilename = require("unique-filename");
 const { db, storage } = require("../services/firebase");
 const getFbStorageUrl = require("../utils/getFbStorageUrl");
 
-exports.fileUpload = (req, res) => {
+// add user details
+exports.addUserDetails = async (req, res) => {
+  const { bio, website, location } = req.body;
+
+  // todo: add user details validation (no include empty fields + correct http(s)!)
+  const userDetails = {
+    bio: bio || "",
+    website: website || "",
+    location: location || ""
+  };
+
+  console.log(userDetails);
+
+  try {
+    await db.doc(`/users/${req.locals.user.handle}`).update(userDetails);
+    return res.status(200).json({ message: "Details added successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.code });
+  }
+};
+
+// upload avatar image
+exports.uploadProfileImage = (req, res) => {
   let image;
   const busboy = new BusBoy({ headers: req.headers });
 
