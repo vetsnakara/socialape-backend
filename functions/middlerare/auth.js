@@ -5,7 +5,7 @@ exports.isAuthenticated = async (req, res, next) => {
     const tokenHeader = req.headers["x-auth-token"];
 
     if (tokenHeader && tokenHeader.startsWith("Bearer ")) {
-      const token = tokenHeader.split("Bearer ")[1];
+      const token = tokenHeader.split("Bearer ")[1].trim();
 
       const decodedToken = await admin.auth().verifyIdToken(token);
 

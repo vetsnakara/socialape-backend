@@ -1,5 +1,8 @@
 const { firebase, db } = require("../services/firebase");
 const { validate, schemas } = require("../utils/validation");
+const getFbStorageUrl = require("../utils/getFbStorageUrl");
+
+const NO_USER_IMAGE = "no-user-image.jpg";
 
 // sign up
 exports.signUp = async (req, res) => {
@@ -43,6 +46,7 @@ exports.signUp = async (req, res) => {
       userId: uid,
       handle,
       email,
+      imgUrl: getFbStorageUrl(NO_USER_IMAGE),
       createdAt: new Date().toISOString()
     });
 

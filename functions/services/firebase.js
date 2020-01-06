@@ -13,5 +13,6 @@ module.exports = {
   firebase,
   admin,
   functions,
-  db: admin.firestore()
+  db: admin.firestore(),
+  storage: admin.storage().bucket()
 };
