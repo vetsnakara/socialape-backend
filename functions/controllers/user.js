@@ -7,6 +7,34 @@ const uniqueFilename = require("unique-filename");
 const { db, storage } = require("../services/firebase");
 const getFbStorageUrl = require("../utils/getFbStorageUrl");
 
+// get user details
+exports.getAuthenticatedUser = async (req, res) => {
+  try {
+    const userDoc = await db.doc(`/users/${req.locals.user.handle}`).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: "Authenticated user not found" });
+    }
+
+    const userData = {
+      credentials: userDoc.data()
+    };
+
+    const likeDocs = await db
+      .collection("likes")
+      .where("userHandle", "==", req.locals.user.handle)
+      .get();
+
+    userData.likes = [];
+    likeDocs.forEach(doc => userData.likes.push(doc.data()));
+
+    return res.status(200).json(userData);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.code });
+  }
+};
+
 // add user details
 exports.addUserDetails = async (req, res) => {
   const { bio, website, location } = req.body;
@@ -17,8 +45,6 @@ exports.addUserDetails = async (req, res) => {
     website: website || "",
     location: location || ""
   };
-
-  console.log(userDetails);
 
   try {
     await db.doc(`/users/${req.locals.user.handle}`).update(userDetails);
@@ -31,7 +57,7 @@ exports.addUserDetails = async (req, res) => {
 
 // upload avatar image
 exports.uploadProfileImage = (req, res) => {
-  let image;
+  let image = null;
   const busboy = new BusBoy({ headers: req.headers });
 
   // upload file to tmp dir on the server
@@ -55,6 +81,10 @@ exports.uploadProfileImage = (req, res) => {
   // upload image to firebase storage
   busboy.on("finish", async () => {
     try {
+      if (!image) {
+        return res.status(400).json({ error: "No file provided" });
+      }
+
       await storage.upload(image.filepath, {
         resumable: false,
         metadata: {

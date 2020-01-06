@@ -2,7 +2,7 @@ const { admin, db } = require("../services/firebase");
 
 exports.isAuthenticated = async (req, res, next) => {
   try {
-    const tokenHeader = req.headers["x-auth-token"];
+    const tokenHeader = req.headers["authorization"];
 
     if (tokenHeader && tokenHeader.startsWith("Bearer ")) {
       const token = tokenHeader.split("Bearer ")[1].trim();
