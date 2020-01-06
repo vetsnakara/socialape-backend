@@ -1,11 +1,9 @@
 const router = require("express").Router();
-const { getAll, create } = require("../controllers/post");
+const { getAll, getOne, createPost } = require("../controllers/post");
 const { isAuthenticated } = require("../middlerare/auth");
 
-// get all posts
+router.get("/:postId", getOne);
 router.get("/", getAll);
-
-// create new post
-router.post("/", [isAuthenticated], create);
+router.post("/", [isAuthenticated], createPost);
 
 module.exports = router;

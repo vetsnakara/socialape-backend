@@ -21,6 +21,14 @@ const db = {
       likeCount: 5,
       commentCount: 10
     }
+  ],
+  comments: [
+    {
+      userHandle: "user",
+      postId: "78f7g87sgs87g7g09",
+      body: "some nice comment",
+      createdAt: "2020-01-04T19:23:12.102Z"
+    }
   ]
 };
 

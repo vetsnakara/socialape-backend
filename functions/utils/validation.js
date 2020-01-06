@@ -4,6 +4,7 @@ const ERR_MSG_EMPTY_FIELD = "Should not be empty";
 const ERR_MSG_INVALID_EMAIL = "Should be a valid email";
 const ERR_MSG_PASSWORD_CONFIRM = "Passwords don't match";
 
+// sign up form
 const signUp = yup.object().shape({
   handle: yup.string().required(ERR_MSG_EMPTY_FIELD),
   email: yup
@@ -16,12 +17,18 @@ const signUp = yup.object().shape({
     .oneOf([yup.ref("password")], ERR_MSG_PASSWORD_CONFIRM)
 });
 
+// log in form
 const logIn = yup.object().shape({
   email: yup
     .string()
     .email(ERR_MSG_INVALID_EMAIL)
     .required(ERR_MSG_EMPTY_FIELD),
   password: yup.string().required(ERR_MSG_EMPTY_FIELD)
+});
+
+// add comment form
+const addComment = yup.object().shape({
+  body: yup.string().required(ERR_MSG_EMPTY_FIELD)
 });
 
 const validate = (object, schema) => {
@@ -37,7 +44,8 @@ const validate = (object, schema) => {
 module.exports = {
   schemas: {
     signUp,
-    logIn
+    logIn,
+    addComment
   },
   validate
 };

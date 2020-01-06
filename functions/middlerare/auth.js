@@ -15,13 +15,14 @@ exports.isAuthenticated = async (req, res, next) => {
         .limit(1)
         .get();
 
-      const handle = userData.docs[0].data().handle;
+      const { handle, imgUrl } = userData.docs[0].data();
 
       req.locals = {
         ...req.locals,
         user: {
           decodedToken,
-          handle
+          handle,
+          imgUrl
         }
       };
 

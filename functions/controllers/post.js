@@ -1,5 +1,37 @@
 const { db } = require("../services/firebase");
 
+// get one post by id
+exports.getOne = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const postDoc = await db.doc(`/posts/${postId}`).get();
+
+    if (!postDoc.exists) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const postData = {
+      id: postDoc.id,
+      ...postDoc.data()
+    };
+
+    const commentDocs = await db
+      .collection("comments")
+      .where("postId", "==", postId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    postData.comments = [];
+    commentDocs.forEach(doc => postData.comments.push(doc.data()));
+
+    return res.status(200).json(postData);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.code });
+  }
+};
+
 // get all posts
 exports.getAll = async (req, res) => {
   try {
@@ -27,7 +59,7 @@ exports.getAll = async (req, res) => {
 };
 
 // create new post
-exports.create = async (req, res) => {
+exports.createPost = async (req, res) => {
   try {
     const { body } = req.body;
 
