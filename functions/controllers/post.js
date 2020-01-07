@@ -41,13 +41,23 @@ exports.getAll = async (req, res) => {
       .get();
 
     const posts = snap.docs.map(doc => {
-      const { body, userHandle, createdAt } = doc.data();
+      const {
+        body,
+        userHandle,
+        createdAt,
+        commentCount,
+        likeCount,
+        userImage
+      } = doc.data();
 
       return {
         id: doc.id,
         body,
         userHandle,
-        createdAt
+        createdAt,
+        commentCount,
+        likeCount,
+        userImage
       };
     });
 
@@ -65,8 +75,11 @@ exports.createPost = async (req, res) => {
 
     const newPost = {
       userHandle: req.locals.user.handle,
+      userImage: req.locals.user.imgUrl,
       body,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      likeCount: 0,
+      commentCount: 0
     };
 
     const doc = await db.collection("posts").add(newPost);
@@ -75,5 +88,35 @@ exports.createPost = async (req, res) => {
   } catch (error) {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// delete post
+exports.deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const postRef = await db.doc(`/posts/${postId}`);
+    const postDoc = await postRef.get();
+
+    if (!postDoc.exists) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const post = postDoc.data();
+
+    if (post.userHandle !== req.locals.user.handle) {
+      return res.status(403).json({
+        error: "Unauthorized",
+        info: "This post wasn't created by you"
+      });
+    }
+
+    await postRef.delete();
+
+    return res.status(200).json({ message: "Post was successfully deleted" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.code });
   }
 };

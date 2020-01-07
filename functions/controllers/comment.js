@@ -14,7 +14,8 @@ exports.createComment = async (req, res) => {
       return res.status(400).json(validationError);
     }
 
-    const postDoc = await db.doc(`/posts/${postId}`).get();
+    const postRef = await db.doc(`/posts/${postId}`);
+    const postDoc = await postRef.get();
 
     if (!postDoc.exists) {
       return res.status(404).json({ error: "Post not found" });
@@ -29,6 +30,11 @@ exports.createComment = async (req, res) => {
     };
 
     await db.collection("comments").add(newComment);
+
+    const post = postDoc.data();
+    await postRef.update({
+      commentCount: post.commentCount + 1
+    });
 
     return res.status(201).json({ message: "Comment added successfully" });
   } catch (error) {

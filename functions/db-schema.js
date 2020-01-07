@@ -29,6 +29,12 @@ const db = {
       body: "some nice comment",
       createdAt: "2020-01-04T19:23:12.102Z"
     }
+  ],
+  likes: [
+    {
+      userHandle: "user",
+      postId: "dsjfjjhds98dsng97"
+    }
   ]
 };
 
