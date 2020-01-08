@@ -60,11 +60,12 @@ exports.getAuthenticatedUser = async (req, res) => {
     const likeDocs = await db
       .collection("likes")
       .where("userHandle", "==", req.locals.user.handle)
-      .orderBy("createdAt", "desc")
       .get();
 
     userData.likes = [];
-    likeDocs.forEach(doc => userData.likes.push(doc.data()));
+    likeDocs.forEach(doc => {
+      userData.likes.push(doc.data());
+    });
 
     const notificationDocs = await db
       .collection("notifications")

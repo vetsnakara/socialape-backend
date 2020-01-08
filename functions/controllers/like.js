@@ -20,6 +20,12 @@ exports.like = async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
+    // check if user likes own post
+    const post = postDoc.data();
+    if (post.userHandle === req.locals.user.handle) {
+      return res.status(400).json({ error: "Can't like own post" });
+    }
+
     // check if post already liked
     const likeDoc = await db
       .collection("likes")
@@ -36,7 +42,6 @@ exports.like = async (req, res) => {
     await db.collection("likes").add(like);
 
     // update likeCount in post
-    const post = postDoc.data();
     post.likeCount++;
     await postRef.update({
       likeCount: post.likeCount
