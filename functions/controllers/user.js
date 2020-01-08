@@ -8,6 +8,43 @@ const { db, storage } = require("../services/firebase");
 const getFbStorageUrl = require("../utils/getFbStorageUrl");
 
 // get user details
+exports.getUserDetails = async (req, res) => {
+  try {
+    const userDoc = await db
+      .collection("users")
+      .doc(req.params.handle)
+      .get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userData = {
+      user: userDoc.data(),
+      posts: []
+    };
+
+    const postDocs = await db
+      .collection("posts")
+      .where("userHandle", "==", req.params.handle)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    postDocs.forEach(doc =>
+      userData.posts.push({
+        postId: doc.id,
+        ...doc.data()
+      })
+    );
+
+    return res.status(200).json(userData);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.code });
+  }
+};
+
+// get user details
 exports.getAuthenticatedUser = async (req, res) => {
   try {
     const userDoc = await db.doc(`/users/${req.locals.user.handle}`).get();
