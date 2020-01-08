@@ -35,6 +35,16 @@ const db = {
       userHandle: "user",
       postId: "dsjfjjhds98dsng97"
     }
+  ],
+  notifications: [
+    {
+      recepient: "user",
+      sender: "anoter",
+      read: "true | false",
+      postId: "djhdfg98dfnfd8",
+      type: "like | comment",
+      createdAt: "2020-01-04T19:23:12.102Z"
+    }
   ]
 };
 
