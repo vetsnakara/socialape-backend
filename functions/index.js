@@ -1,5 +1,6 @@
 const app = require("express")();
 const morgan = require("morgan");
+const cors = require("cors");
 
 const { functions } = require("./services/firebase");
 const setupRoutes = require("./routes");
@@ -7,6 +8,7 @@ const setupRoutes = require("./routes");
 const { db } = require("./services/firebase");
 
 app.use(morgan("tiny"));
+app.use(cors());
 
 setupRoutes(app);
 
