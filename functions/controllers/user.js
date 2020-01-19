@@ -150,7 +150,7 @@ exports.uploadProfileImage = (req, res) => {
 
       await db.doc(`/users/${req.locals.user.handle}`).update({ imgUrl });
 
-      return res.status(201).json({ message: "Image uploaded successfully" });
+      return res.status(201).json({ imgUrl });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error });
