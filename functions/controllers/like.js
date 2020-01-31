@@ -13,7 +13,7 @@ exports.like = async (req, res) => {
     };
 
     // check for post existance
-    const postRef = db.doc(`/posts/${req.params.postId}`);
+    const postRef = db.doc(`/posts/${postId}`);
     const postDoc = await postRef.get();
 
     if (!postDoc.exists) {
@@ -47,7 +47,7 @@ exports.like = async (req, res) => {
       likeCount: post.likeCount
     });
 
-    return res.status(200).json(post);
+    return res.status(200).json(like);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.code });
@@ -59,6 +59,8 @@ exports.unlike = async (req, res) => {
   try {
     const { handle: userHandle } = req.locals.user;
     const { postId } = req.params;
+
+    console.log("unlike request started");
 
     // like object
     const like = {
@@ -96,7 +98,8 @@ exports.unlike = async (req, res) => {
       likeCount: post.likeCount
     });
 
-    return res.status(200).json(post);
+    console.log("unlike request finished");
+    return res.status(200).json(like);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.code });

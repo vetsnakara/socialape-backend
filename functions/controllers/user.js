@@ -100,7 +100,7 @@ exports.addUserDetails = async (req, res) => {
 
   try {
     await db.doc(`/users/${req.locals.user.handle}`).update(userDetails);
-    return res.status(200).json({ message: "Details added successfully" });
+    return res.status(200).json(userDetails);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.code });
